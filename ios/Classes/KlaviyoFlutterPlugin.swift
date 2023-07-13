@@ -21,14 +21,15 @@ public class KlaviyoFlutterPlugin: NSObject, FlutterPlugin, UNUserNotificationCe
 
   private let klaviyo = KlaviyoSDK()
 
-  public static func register(with registrar: FlutterPluginRegistrar) {
+  public static func register(with registrar: FlutterPluginRegistrar, appDelegate: AppDelegate? = nil) {
     let messenger = registrar.messenger()
     let channel = FlutterMethodChannel(name: methodChannelName, binaryMessenger: messenger)
     let instance = KlaviyoFlutterPlugin()
 
     if #available(OSX 10.14, *) {
-        let center = UNUserNotificationCenter.current()
-        center.delegate = instance
+        if let appDelegate = appDelegate {
+            center.delegate = appDelegate
+        }
     }
 
     registrar.addMethodCallDelegate(instance, channel: channel)
