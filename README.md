@@ -8,7 +8,7 @@ and [iOS](https://github.com/klaviyo/klaviyo-swift-sdk) projects.
 
 - Uses Klaviyo Android SDK Version `1.1.1`.
 - The minimum Android SDK `minSdkVersion` required is 23.
-- Uses Klaviyo iOS SDK Version `2.0.1`.
+- Uses Klaviyo iOS SDK Version `2.2.0`.
 - The minimum iOS target version required is 13.
 
 ## Usage
