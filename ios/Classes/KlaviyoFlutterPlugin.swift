@@ -21,22 +21,18 @@ public class KlaviyoFlutterPlugin: NSObject, FlutterPlugin, UNUserNotificationCe
     
     private let klaviyo = KlaviyoSDK()
     
-    public static func register(with registrar: FlutterPluginRegistrar, userNotificationDelegate delegate: UNUserNotificationCenterDelegate? = nil) {
+    public static func register(with registrar: FlutterPluginRegistrar) {
         let messenger = registrar.messenger()
         let channel = FlutterMethodChannel(name: methodChannelName, binaryMessenger: messenger)
         let instance = KlaviyoFlutterPlugin()
-        
-        if let delegate = delegate {
-            delegate = instance
-        } else {
-            if #available(OSX 10.14, *) {
-                let center = UNUserNotificationCenter.current()
-                center.delegate = instance
-            }
+
+        if #available(OSX 10.14, *) {
+            let center = UNUserNotificationCenter.current()
+            center.delegate = instance
         }
-        
+
         registrar.addMethodCallDelegate(instance, channel: channel)
-    }
+      }
     
     // below method will be called when the user interacts with the push notification
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {

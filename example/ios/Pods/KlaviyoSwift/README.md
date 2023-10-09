@@ -7,12 +7,6 @@
 [![License](https://img.shields.io/cocoapods/l/KlaviyoSwift.svg?style=flat)](http://cocoapods.org/pods/KlaviyoSwift)
 [![Platform](https://img.shields.io/cocoapods/p/KlaviyoSwift.svg?style=flat)](http://cocoapods.org/pods/KlaviyoSwift)
 
-## DISCLAIMER
-
-*This project is in a closed beta,
-breaking changes could still be made to the API.
-This is not yet intended for public use*
-
 ## Overview
 
 KlaviyoSwift is an SDK, written in Swift that can be integrated into your iOS App. The SDK enables you to engage with your customers using push notifications. In addition you will be able to take advantage of Klaviyo's identification and event tracking functionality. Once integrated, your marketing team will be able to better understand your app users' needs and send them timely messages via APNs.
@@ -23,6 +17,7 @@ KlaviyoSwift is an SDK, written in Swift that can be integrated into your iOS Ap
 1. [Install with Cocoapods](#install-with-cocoapods)
 
 ## [Install with SPM](#install-with-spm)
+
 KlaviyoSwift is available via [Swift Package Manager (SPM)](https://swift.org/package-manager/). Follow the steps below to install.
 
 1. Open your project and navigate to your project’s settings.
@@ -33,6 +28,7 @@ KlaviyoSwift is available via [Swift Package Manager (SPM)](https://swift.org/pa
 6. Click **Finish**.
 
 ## [Install with CocoaPods](#install-with-cocoapods)
+
 KlaviyoSwift is available through [CocoaPods](https://cocoapods.org/?q=klaviyo).
 
 1. To install, add the following line to your Podfile:
@@ -45,8 +41,8 @@ pod "KlaviyoSwift"
 
 The library can be kept up-to-date via `pod update`.
 
-
 ## Event tracking
+
 After the SDK is installed you can begin tracking events in your app.
 
 1. Make sure any .swift files using the Klaviyo SDK contain the following import call:
@@ -58,7 +54,7 @@ import KlaviyoSwift
 2. To add Klaviyo's tracking functionality, include the following line in AppDelegate.swift, within `application:didFinishLaunchingWithOptions`:
 
 ```swift
-KlaviyoSDK().initalize(with: "YOUR_KLAVIYO_PUBLIC_API_KEY")
+KlaviyoSDK().initialize(with: "YOUR_KLAVIYO_PUBLIC_API_KEY")
 ```
 
 3. Begin tracking events anywhere within your application by calling the `create(event:)` method in the relevant location.
@@ -77,23 +73,24 @@ profile: [
 
 klaviyo.create(event: event)
 ```
+
 ### Arguments
 
 The `create` method takes an event object as an argument. The event can be constructed with the following arguments:
 
-* `name`: The name of the event you want to track, as a EventName enum.  The are a number of commonly used event names provided by default. If you need to log an event with a different name use `CustomEvent` with a string of your choosing. This argument is required to track an event.
+- `name`: The name of the event you want to track, as a EventName enum. The are a number of commonly used event names provided by default. If you need to log an event with a different name use `CustomEvent` with a string of your choosing. This argument is required to track an event.
 
-* `profile`: An dictionary of properties that belong to the person who did the action you're tracking. Including an `$email`, `$phone_number` or `$id` key associates the event with particular profile in Klaviyo. In addition the SDK will retain these properties for use in future sdk calls, therefore if they are not included previously set identifiers will be used to log the event. This argument is optional.
+- `profile`: An dictionary of properties that belong to the person who did the action you're tracking. Including an `$email`, `$phone_number` or `$id` key associates the event with particular profile in Klaviyo. In addition the SDK will retain these properties for use in future sdk calls, therefore if they are not included previously set identifiers will be used to log the event. This argument is optional.
 
-* `properties`: An dictionary of properties that are specific to the event. This argument is optional.
+- `properties`: An dictionary of properties that are specific to the event. This argument is optional.
 
-* `time`: This is the timestamp, as an `Date`, when the event occurred. This argument is optional but recommended if you are tracking past events. If you're tracking real- time activity, you can ignore this argument.
+- `time`: This is the timestamp, as an `Date`, when the event occurred. This argument is optional but recommended if you are tracking past events. If you're tracking real- time activity, you can ignore this argument.
 
-* `value`: A numeric value (`Double`) to associate with this event. For example, the dollar amount of a purchase.
+- `value`: A numeric value (`Double`) to associate with this event. For example, the dollar amount of a purchase.
 
 ## Identifying traits of people
 
-If you app collects additional identifying traits about your users you can provide this to Klaviyo via the `set(profileAttribute:value:)` or `set(profile:) methods and via the . In both cases we've provided a wide array of commonly used profile properties you can use. If you need something more custom though you can always pass us those properties via the properties dictionary when you create your profile object.
+If your app collects additional identifying traits about your users you can provide this to Klaviyo via the `set(profileAttribute:value:)` or `set(profile:)` methods and via the individual setters methods for email, phone number, and external id. In both cases we've provided a wide array of commonly used profile properties you can use. If you need something more custom though you can always pass us those properties via the properties dictionary when you create your profile object.
 
 ```swift
 let profile = Profile(email: "junior@blob.com", firstName: "Blob", lastName: "Jr")
@@ -104,9 +101,7 @@ KlaviyoSDK().set(profileAttribute: .firstName, "Blob")
 KlaviyoSDK().set(profileAttribute: .lastName, "Jr")
 ```
 
-
 Note that the only argument `set(profile:)` takes is a dictionary representing a customer's attributes. This is different from `trackEvent`, which can take multiple arguments.
-
 
 ## Anonymous Tracking Notice
 
@@ -125,9 +120,10 @@ KlaviyoSDK().set(email: "junior@blob.com")
 ## Push Notifications
 
 Implementing push notifications requires a few additional snippets of code to enable.:
+
 1. Registering users for push notifications.
 2. Sending resulting push tokens to Klaviyo.
-3. Handlinge when users attempt to open your push notifications.
+3. Handling when users attempt to open your push notifications.
 
 ### Sending push notifications
 
@@ -154,7 +150,7 @@ Implementing push notifications requires a few additional snippets of code to en
 	UIApplication.shared.registerForRemoteNotifications()
 ```
 
-2. Add the following code to the application delegate file in  `application:didRegisterForRemoteNotificationsWithDeviceToken`. You may need to add this code to your application delegate if you have not done so already.
+2. Add the following code to the application delegate file in `application:didRegisterForRemoteNotificationsWithDeviceToken`. You may need to add this code to your application delegate if you have not done so already.
 
 ```swift
     func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -165,9 +161,10 @@ Implementing push notifications requires a few additional snippets of code to en
 Any users that enable/accept push notifications from your app now will be eligible to receive your custom notifications.
 
 To read more about sending push notifications, check out our additional push notification guides.
-* [How to set up push notifications](https://help.klaviyo.com/hc/en-us/articles/360023213971)
-* [How to send a push notification campaign](https://help.klaviyo.com/hc/en-us/articles/360006653972)
-* [How to add a push notification to a flow](https://help.klaviyo.com/hc/en-us/articles/12932504108571)
+
+- [How to set up push notifications](https://help.klaviyo.com/hc/en-us/articles/360023213971)
+- [How to send a push notification campaign](https://help.klaviyo.com/hc/en-us/articles/360006653972)
+- [How to add a push notification to a flow](https://help.klaviyo.com/hc/en-us/articles/12932504108571)
 
 ### Tracking push notifications
 
@@ -187,7 +184,7 @@ The following code example allows you to track when a user opens a push notifica
 
 ```
 
-Once your first push notifications are sent and opened, you should start to see *Opened Push* metrics within your Klaviyo dashboard.
+Once your first push notifications are sent and opened, you should start to see _Opened Push_ metrics within your Klaviyo dashboard.
 
 ### Foreground push handling
 
@@ -206,21 +203,23 @@ The following code example allows push notifications to be displayed when your a
     }
 ```
 
-If a user taps on the notification with the application open, this event is tracked as an *Opened Push* event.
+If a user taps on the notification with the application open, this event is tracked as an _Opened Push_ event.
 
 ## Handling deep linking
 
 > :warning: **Your app needs to use version 1.7.2 at a minimum in order for the below steps to work.**
 
-
 There are two use cases for deep linking that can be relevant here:
+
 1. When you push a notification to your app with a deep link.
 2. Any other cases where you may want to deep link into your app via SMS, email, web browser etc.
 
 In order for deep linking to work, there are a few configurations that are needed and these are no different from what are required for handling deep linking in general and [Apple documentation](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on this can be followed in conjunction with the steps highlighted here:
 
 ### Option 1: Modify Open Tracking
+
 If you plan to use universal links in your app for deep linking you will need to modify the push open tracking as described below:
+
 ```swift
     extension AppDelegate: UNUserNotificationCenterDelegate {
         func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -234,9 +233,11 @@ If you plan to use universal links in your app for deep linking you will need to
     }
 
 ```
+
 Note that the deep link handler will be called back on the main thread. If you want to handle uri schemes in addition to universal links you implement them as described below.
 
 ### Option 2: Use URL Schemes
+
 If you do not need universal link support you can instead implement url schemes for your app and the deepLinkHandler as indicated in Option 1 can be omitted. The Klaviyo SDK will follow all url automatically in this case.
 
 #### Step 1: Register the URL scheme
@@ -266,7 +267,6 @@ In order to edit the Info.plist directly, just fill in your app specific details
 	</dict>
 </array>
 ```
-
 
 #### Step 2: Whitelist supported URL schemes
 
@@ -309,7 +309,7 @@ func application(
 }
 ```
 
-If you are using SwiftUI, then you can implement [`onOpenURL(perform:)`](https://developer.apple.com/documentation/swiftui/view/onopenurl(perform:)) as a view modifier in the view you intent to handle deep links. This may or may not be the root of your scene.
+If you are using SwiftUI, then you can implement [`onOpenURL(perform:)`](<https://developer.apple.com/documentation/swiftui/view/onopenurl(perform:)>) as a view modifier in the view you intent to handle deep links. This may or may not be the root of your scene.
 
 Example:
 
@@ -333,18 +333,100 @@ Additionally, you can also locally trigger a deep link to make sure your code is
 
 `xcrun simctl openurl booted {your_URL_here}`
 
+## Rich push notifications
+
+Rich push notification is the ability to add images to your push notification messages that Apple has supported since iOS 10. In order to do this Apple requires your app to implement a [Notification service extension](https://developer.apple.com/documentation/usernotifications/unnotificationserviceextension). Following the below steps should help set up your app to receive rich push notifications.
+
+### Step 1: Add notification service app extension to your project
+
+A notification service app extension ships as a separate bundle inside your iOS app. To add this extension to your app:
+
+1. Select File > New > Target in Xcode.
+2. Select the Notification Service Extension target from the iOS > Application extension section.
+3. Click Next.
+4. Specify a name and other configuration details for your app extension.
+5. Click Finish.
+
+⚠️ By default the deployment target of your notification service extension might be the latest iOS version and not
+the minimum you want to support. This may cause push notifications to not show the attached media in devices whose
+iOS versions are lower than the deployment target of the notification service extension. ⚠️
+
+### Step 2: Implement the notification service app extension
+
+The notification service app extension is responsible for downloading the media resource and attaching it to the push notification.
+
+Once step 1 is complete, you should see a file called `NotificationService.swift` under the notification service extension target. From here on depending on which dependency manager you use the steps would look slightly different:
+
+#### Swift Package Manager(SPM)
+
+> :warning: **Since this feature is invite only currently please use the pre release version ([2.1.0-beta1](https://github.com/klaviyo/klaviyo-swift-sdk/releases/tag/2.1.0-beta1))) of the SDK and the extension**
+
+- Tap on the newly created notification service extension target
+- Under General > Frameworks and libraries add `KlaviyoSwiftExtension` using the + button at the bottom left.
+- Then in the `NotificationService.swift` file add the code for the two required delegates from [this](Examples/KlaviyoSwiftExamples/SPMExample/NotificationServiceExtension/NotificationService.swift) file. This sample covers calling into Klaviyo so that we can download and attach the media to the push notification.
+
+#### Cocoapods
+
+> :warning: **Since this feature is invite only currently please use the pre release version ([2.1.0-beta1](https://github.com/klaviyo/klaviyo-swift-sdk/releases/tag/2.1.0-beta1))) of the SDK and the extension**
+
+- In your `Podfile` add in `KlaviyoSwiftExtension` as a dependency to the newly added notification service extension target.
+
+  Example:
+
+  ```
+  target 'NotificationServiceExtension' do
+      pod 'KlaviyoSwiftExtension', '2.1.0-beta1'
+  end
+  ```
+
+  Be sure to replace the name of your notification service extension target above.
+
+- Once you've added in the dependency make sure to `pod install`.
+- Then in the `NotificationService.swift` file add the code for the two required delegates from [this](Examples/KlaviyoSwiftExamples/CocoapodsExample/NotificationServiceExtension/NotificationService.swift) file. This sample covers calling into Klaviyo so that we can download and attach the media to the push notification.
+
+### Step 3: Test your rich push notifications
+
+#### Local testing
+
+There are three things you would need to do this -
+
+1. Any push notifications tester such as [this](https://github.com/onmyway133/PushNotifications).
+2. A push notification payload that resembles what Klaviyo would send to you. The below payload should work as long as the image is valid:
+
+```json
+{
+  "aps": {
+    "alert": {
+      "title": "Free apple vision pro",
+      "body": "Free Apple vision pro when you buy a Klaviyo subscription."
+    },
+    "mutable-content": 1
+  },
+  "rich-media": "https://www.apple.com/v/apple-vision-pro/a/images/overview/hero/portrait_base__bwsgtdddcl7m_large.jpg",
+  "rich-media-type": "jpg"
+}
+```
+
+3. A real device's push notification token. This can be printed out to the console from the `didRegisterForRemoteNotificationsWithDeviceToken` method in `AppDelegate`.
+
+Once we have these three things we can then use the push notifications tester and send a local push notification to make sure that everything was set up correctly.
+
+#### Testing with Klaviyo
+
+At this point unfortunately we don't support testing debug builds with Klaviyo. So if you are trying to send a test push notification to a debug build you'll see an error on Klaviyo.
+
+A suggested temporary workaround would be creating a test flight build with the above changes required for rich push notifications, performing some actions on the test flight build to identify the device and making sure you are able to see that device in Klaviyo. Once you have that device's push token in any profile you can create a list or segment with that profile and send a push campaign with an image to test the full end-to-end integration.
+
 ## SDK Data Transfer
 
 Starting with version 1.7.0, the SDK will cache incoming data and flush it back to the Klaviyo API on an interval. The interval is based on the network link currently in use by the app. The table below shows the flush interval used for each type of connection:
 
-| Network     | Interval    |
-| :---        | :--- |
-| WWAN/Wifi   | 10 seconds  |
-| Cellular    | 30 seconds  |
-
+| Network   | Interval   |
+| :-------- | :--------- |
+| WWAN/Wifi | 10 seconds |
+| Cellular  | 30 seconds |
 
 Connection determination is based on notifications from our reachability service. When there is no network available, the SDK will cache data until the network becomes available again. All data sent by the SDK should be available shortly after it is flushed by the SDK.
-
 
 ### Retries
 

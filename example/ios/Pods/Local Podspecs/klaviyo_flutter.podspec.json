@@ -19,7 +19,7 @@
 
     ],
     "KlaviyoSwift": [
-
+      "~> 2.2.0"
     ]
   },
   "platforms": {

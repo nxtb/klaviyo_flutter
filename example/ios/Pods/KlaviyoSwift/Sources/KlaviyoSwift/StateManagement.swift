@@ -30,7 +30,7 @@ enum KlaviyoAction: Equatable {
     case setEmail(String)
     case setPhoneNumber(String)
     case setExternalId(String)
-    case setPushToken(String)
+    case setPushToken(String, KlaviyoState.PushEnablement)
     case dequeCompletedResults(KlaviyoAPI.KlaviyoRequest)
     case networkConnectivityChanged(Reachability.NetworkStatus)
     case flushQueue
@@ -122,11 +122,13 @@ struct KlaviyoReducer: ReducerProtocol {
             state.externalId = externalId
             state.enqueueProfileRequest()
             return .none
-        case let .setPushToken(pushToken):
+        case let .setPushToken(pushToken, enablement):
             guard case .initialized = state.initalizationState else {
                 return .none
             }
             state.pushToken = pushToken
+            state.pushEnablement = enablement
+            state.pushBackground = environment.getBackgroundSetting()
             guard let request = try? state.buildTokenRequest() else {
                 return .none
             }
@@ -380,36 +382,35 @@ extension KlaviyoState {
             throw KlaviyoAPI.KlaviyoAPIError.internalError("missing push token")
         }
         let payload = KlaviyoAPI.KlaviyoRequest.KlaviyoEndpoint.PushTokenPayload(
-            token: apiKey,
-            properties: .init(anonymousId: anonymousId,
-                              pushToken: token,
-                              email: email,
-                              phoneNumber: phoneNumber,
-                              externalId: externalId))
-        let endpoint = KlaviyoAPI.KlaviyoRequest.KlaviyoEndpoint.storePushToken(payload)
+            pushToken: token,
+            enablement: (pushEnablement ?? .notDetermined).rawValue,
+            background: (pushBackground ?? .available).rawValue,
+            profile: .init(email: email, phoneNumber: phoneNumber, externalId: externalId),
+            anonymousId: anonymousId)
+        let endpoint = KlaviyoAPI.KlaviyoRequest.KlaviyoEndpoint.registerPushToken(payload)
         return KlaviyoAPI.KlaviyoRequest(apiKey: apiKey, endpoint: endpoint)
     }
 }
 
 extension Event {
     func updateStateAndEvent(state: inout KlaviyoState) -> Event {
-        let identifiers = identifiers
-        var profile = profile
-        if let email = identifiers?.email ?? profile["$email"] as? String {
+        let email = identifiers?.email ?? state.email
+        let phoneNumber = identifiers?.phoneNumber ?? state.phoneNumber
+        let externalId = identifiers?.externalId ?? state.externalId
+        let identifiers = Identifiers(
+            email: email,
+            phoneNumber: phoneNumber,
+            externalId: externalId)
+        if let email = identifiers.email {
             state.email = email
-        } else {
-            profile["$email"] = state.email
         }
-        if let phoneNumber = identifiers?.phoneNumber ?? profile["$phone_number"] as? String {
+        if let phoneNumber = identifiers.phoneNumber {
             state.phoneNumber = phoneNumber
-        } else {
-            profile["$phone_number"] = state.phoneNumber
         }
-        if let externalId = identifiers?.externalId ?? profile["$id"] as? String {
+        if let externalId = identifiers.externalId {
             state.externalId = externalId
-        } else {
-            profile["$id"] = state.externalId
         }
+
         var properties = properties
         if metric.name == EventName.OpenedPush,
            let pushToken = state.pushToken {
@@ -417,6 +418,7 @@ extension Event {
         }
         return Event(name: metric.name,
                      properties: properties,
+                     identifiers: identifiers,
                      profile: profile,
                      value: value,
                      time: time,

@@ -70,9 +70,6 @@ public class Klaviyo: NSObject {
 
     // KL Definitions File: API URL Constants
 
-    let KlaviyoServerTrackEventEndpoint = "/track"
-    let KlaviyoServerTrackPersonEndpoint = "/identify"
-
     let KlaviyoServerURLString = "https://a.klaviyo.com"
 
     let CustomerPropertiesAppendDictKey = "$append"
@@ -192,8 +189,7 @@ public class Klaviyo: NSObject {
            let body = properties["body"] as? [String: Any], let _ = body["_k"] {
             Self.sdkInstance
                 .create(event: Event(name: .OpenedPush,
-                                     properties: properties,
-                                     profile: [:]))
+                                     properties: properties))
             if let url = properties["url"] as? String, let url = URL(string: url) {
                 Task {
                     await MainActor.run {
@@ -467,7 +463,12 @@ public struct KlaviyoSDK {
     /// - Parameter pushToken: data object containing a push token.
     public func set(pushToken: Data) {
         let apnDeviceToken = pushToken.map { String(format: "%02.2hhx", $0) }.joined()
-        dispatchOnMainThread(action: .setPushToken(apnDeviceToken))
+
+        environment.getNotificationSettings { enablement in
+            dispatchOnMainThread(action: .setPushToken(
+                apnDeviceToken,
+                enablement))
+        }
     }
 
     /// Track a notificationResponse open event in Klaviyo. NOTE: all callbacks will be made on the main thread.
@@ -479,7 +480,7 @@ public struct KlaviyoSDK {
     public func handle(notificationResponse: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void, deepLinkHandler: ((URL) -> Void)? = nil) -> Bool {
         if let properties = notificationResponse.notification.request.content.userInfo as? [String: Any],
            let body = properties["body"] as? [String: Any], let _ = body["_k"] {
-            create(event: Event(name: .OpenedPush, properties: properties, profile: [:]))
+            create(event: Event(name: .OpenedPush, properties: properties))
             Task {
                 await MainActor.run {
                     if let url = properties["url"] as? String, let url = URL(string: url) {
